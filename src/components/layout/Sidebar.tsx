@@ -1,118 +1,82 @@
 import { NavLink } from 'react-router-dom';
 
+import { useAuth } from '../../context/AuthContext';
+import {
+  AdminIcon,
+  AppsIcon,
+  DashboardIcon,
+  LogsIcon,
+  MetricsIcon,
+  SettingsIcon,
+  TeapotIcon,
+  TemplatesIcon,
+} from '../icons/Icons';
+
 const navItems = [
-  { to: '/dashboard', icon: '⬡', label: 'Overview' },
-  { to: '/apps', icon: '◈', label: 'Apps' },
-  { to: '/templates', icon: '◻', label: 'Templates' },
-  { to: '/logs', icon: '≡', label: 'Logs' },
+  { to: '/admin', icon: AdminIcon, label: 'Admin' },
+  { to: '/dashboard', icon: DashboardIcon, label: 'Overview' },
+  { to: '/apps', icon: AppsIcon, label: 'Apps' },
+  { to: '/templates', icon: TemplatesIcon, label: 'Templates' },
+  { to: '/metrics', icon: MetricsIcon, label: 'Metrics' },
+  { to: '/logs', icon: LogsIcon, label: 'Logs' },
 ];
 
-export default function Sidebar() {
+export default function Sidebar({ onClose }: { onClose: () => void }) {
+  const { admin } = useAuth();
+  const filteredNavItems = navItems.filter((item) =>
+    item.to === '/admin' ? admin : true
+  );
   return (
-    <aside
-      style={{
-        width: '200px',
-        flexShrink: 0,
-        background: 'var(--bg-base)',
-        borderRight: '0.5px solid var(--border)',
-        display: 'flex',
-        flexDirection: 'column',
-        padding: '1.25rem',
-        height: '100vh',
-        position: 'sticky',
-        top: 0,
-      }}
-    >
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: '8px',
-          marginBottom: '2rem',
-          fontSize: '15px',
-          fontWeight: 500,
-          color: 'var(--text-primary)',
-        }}
-      >
-        <span
-          style={{
-            width: '8px',
-            height: '8px',
-            borderRadius: '50%',
-            background: 'var(--accent)',
-            display: 'inline-block',
-            flexShrink: 0,
-          }}
-        />
-        Ceremony
+    <aside className="w-60 pl-2 flex flex-col h-[calc(100vh-2rem)] sticky top-0 m-4 bg-tile rounded-2xl">
+      <div className="flex items-center justify-between px-3 py-3 text-[20px]">
+        <div className="flex items-center gap-2">
+          <TeapotIcon />
+          <span>Ceremony</span>
+        </div>
+        <button
+          onClick={onClose}
+          className="md:hidden text-muted hover:text-white transition-colors"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="20px"
+            height="20px"
+            viewBox="0 0 1024 1024"
+            className="mr-2 text-base hover:text-accent-bright cursor-pointer"
+            version="1.1"
+          >
+            <path
+              d="M914.368 673.664h-519.68c-25.152 0-45.568-22.016-45.568-48.896 0-26.88 20.416-48.896 45.568-48.896h519.68c25.216 0 45.632 22.016 45.632 48.896 0 26.88-20.48 48.896-45.632 48.896z m0-228.096h-519.68c-25.152 0-45.568-21.952-45.568-48.896 0-26.88 20.416-48.896 45.568-48.896h519.68c25.216 0 45.632 22.016 45.632 48.896 0 26.88-20.48 48.896-45.632 48.896z m-3.264-219.904H115.328c-26.88 0-50.56-20.352-51.328-47.168A48.896 48.896 0 0 1 112.896 128h795.776c26.88 0 50.56 20.416 51.328 47.168a48.896 48.896 0 0 1-48.896 50.56z m-619.776 447.232V348.672L64 510.784l227.328 162.112c0 0.768 0 0.768 0 0z m-178.432 122.944h795.776c26.88 0 50.56 20.48 51.328 47.232a48.896 48.896 0 0 1-48.896 50.496H115.328c-26.88 0-50.56-20.416-51.328-47.232a48.896 48.896 0 0 1 48.896-50.496z"
+              fill="currentColor"
+            />
+          </svg>
+        </button>
       </div>
 
-      <nav
-        style={{
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '2px',
-          flex: 1,
-        }}
-      >
-        {navItems.map((item) => (
-          <NavLink
-            key={item.to}
-            to={item.to}
-            style={({ isActive }) => ({
-              display: 'flex',
-              alignItems: 'center',
-              gap: '10px',
-              padding: '7px 10px',
-              borderRadius: 'var(--radius-md)',
-              fontSize: '13px',
-              color: isActive ? 'var(--accent-dim)' : 'var(--text-secondary)',
-              background: isActive ? 'var(--accent-bg)' : 'transparent',
-              textDecoration: 'none',
-              transition: 'all 0.15s ease',
-              fontFamily: 'var(--font-mono)',
-              letterSpacing: '0.01em',
-            })}
-            onMouseEnter={(e) => {
-              const el = e.currentTarget;
-              if (!el.classList.contains('active')) {
-                el.style.background = 'var(--bg-hover)';
-                el.style.color = 'var(--text-primary)';
-              }
-            }}
-            onMouseLeave={(e) => {
-              const el = e.currentTarget;
-              if (!el.getAttribute('aria-current')) {
-                el.style.background = 'transparent';
-                el.style.color = 'var(--text-secondary)';
-              }
-            }}
-          >
-            <span style={{ fontSize: '16px', opacity: 0.7 }}>{item.icon}</span>
-            {item.label}
-          </NavLink>
-        ))}
+      <nav className="flex flex-col text-muted flex-1">
+        {filteredNavItems.map((item) => {
+          const Icon = item.icon;
+
+          return (
+            <NavLink
+              key={item.to}
+              to={item.to}
+              className="hover:text-accent-bright flex items-center gap-2 px-4 py-4 rounded-md text-[16px] font-mono transition-colors duration-700"
+            >
+              <Icon />
+              {item.label}
+            </NavLink>
+          );
+        })}
       </nav>
 
-      <div
-        style={{ borderTop: '0.5px solid var(--border)', paddingTop: '1rem' }}
-      >
+      <div className="mx-4 mb-4">
         <NavLink
           to="/settings"
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '10px',
-            padding: '7px 10px',
-            borderRadius: 'var(--radius-md)',
-            fontSize: '13px',
-            color: 'var(--text-secondary)',
-            textDecoration: 'none',
-            fontFamily: 'var(--font-mono)',
-          }}
+          className="flex items-center text-muted hover:text-accent-bright text-[16px] font-mono gap-2 px-4 py-2 rounded-md transition-colors duration-700"
         >
-          <span style={{ fontSize: '16px', opacity: 0.7 }}>⚙</span>
-          Settings
+          <SettingsIcon />
+          <span>Settings</span>
         </NavLink>
       </div>
     </aside>

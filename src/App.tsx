@@ -2,6 +2,7 @@ import { Navigate, Route, Routes } from 'react-router-dom';
 
 import Layout from './components/layout/Layout';
 import { useAuth } from './context/AuthContext';
+import AdminDashboard from './pages/AdminDashboard';
 import Dashboard from './pages/Dashboard';
 import AdminApproval from './pages/auth/AdminApproval';
 import Login from './pages/auth/Login';
@@ -10,7 +11,7 @@ import VerifyEmail from './pages/auth/VerifyEmail';
 import VerifyToken from './pages/auth/VerifyToken';
 
 function App() {
-  const { user, loading } = useAuth();
+  const { user, admin, loading } = useAuth();
 
   if (loading) {
     return (
@@ -67,6 +68,12 @@ function App() {
           path="settings"
           element={<div className="text-muted">Settings — coming soon</div>}
         />
+
+        <Route
+          path="admin"
+          element={admin ? <AdminDashboard /> : <Navigate to="/dashboard" />}
+        />
+
         <Route path="*" element={<Navigate to="/dashboard" replace />} />
       </Route>
     </Routes>
