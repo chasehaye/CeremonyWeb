@@ -3,12 +3,15 @@ import { Navigate, Route, Routes } from 'react-router-dom';
 import Layout from './components/layout/Layout';
 import { useAuth } from './context/AuthContext';
 import AdminDashboard from './pages/AdminDashboard';
+import AppDashboard from './pages/AppDashboard';
 import Dashboard from './pages/Dashboard';
+import LogsDashboard from './pages/LogsDashboard';
 import AdminApproval from './pages/auth/AdminApproval';
 import Login from './pages/auth/Login';
 import SignUp from './pages/auth/Signup';
 import VerifyEmail from './pages/auth/VerifyEmail';
 import VerifyToken from './pages/auth/VerifyToken';
+import CreateOrg from './pages/org/CreateOrg';
 
 function App() {
   const { user, admin, loading } = useAuth();
@@ -55,15 +58,28 @@ function App() {
       <Route path="/" element={<Layout />}>
         <Route index element={<Navigate to="/dashboard" replace />} />
         <Route path="dashboard" element={<Dashboard />} />
-        <Route
-          path="apps"
-          element={<div className="text-muted">Apps — coming soon</div>}
-        />
+        <Route path="apps" element={<AppDashboard />} />
+
+        <Route path="orgs/new" element={<CreateOrg />} />
         <Route
           path="templates"
           element={<div className="text-muted">Templates — coming soon</div>}
         />
-        <Route path="/logs" element={<VerifyToken />} />
+        <Route
+          path="docs"
+          element={
+            <div className="text-muted">Documentation — coming soon</div>
+          }
+        />
+        <Route
+          path="metrics"
+          element={<div className="text-muted">Metrics — coming soon</div>}
+        />
+        <Route
+          path="billing"
+          element={<div className="text-muted">Billing — coming soon</div>}
+        />
+        <Route path="/logs" element={<LogsDashboard />} />
         <Route
           path="settings"
           element={<div className="text-muted">Settings — coming soon</div>}

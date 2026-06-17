@@ -60,7 +60,9 @@ export default function AdminDashboard() {
         <span className="text-[12px] text-muted">{users.length} total</span>
       </div>
 
-      {error && <p className="mb-4 text-[12px] text-red-400">{error}</p>}
+      {error && (
+        <p className="mb-4 text-center text-[12px] text-red-400">{error}</p>
+      )}
 
       <div className="rounded-xl bg-tile p-5">
         <p className="mb-4 text-[12px] text-muted">All users</p>

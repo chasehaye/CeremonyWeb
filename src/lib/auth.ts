@@ -2,15 +2,22 @@ import sendRequest from './sendRequest.js';
 
 const BASE_URL = '/api/auth';
 
-interface Payload {
-  [key: string]: string | number | boolean;
+interface RegisterPayload {
+  email: string;
+  password: string;
+  name?: string;
 }
 
-export function registerUser(userData: Payload) {
+interface LoginPayload {
+  email: string;
+  password: string;
+}
+
+export function registerUser(userData: RegisterPayload) {
   return sendRequest(`${BASE_URL}/register`, 'POST', userData);
 }
 
-export function loginUser(userData: Payload) {
+export function loginUser(userData: LoginPayload) {
   return sendRequest(`${BASE_URL}/login`, 'POST', userData);
 }
 

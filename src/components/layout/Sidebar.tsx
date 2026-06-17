@@ -4,30 +4,41 @@ import { useAuth } from '../../context/AuthContext';
 import {
   AdminIcon,
   AppsIcon,
+  BillingIcon,
   DashboardIcon,
+  DocsIcon,
   LogsIcon,
   MetricsIcon,
   SettingsIcon,
   TeapotIcon,
   TemplatesIcon,
 } from '../icons/Icons';
+import { OrgSwitcher } from './OrgSwitcher';
 
 const navItems = [
   { to: '/admin', icon: AdminIcon, label: 'Admin' },
   { to: '/dashboard', icon: DashboardIcon, label: 'Overview' },
+  { to: '/docs', icon: DocsIcon, label: 'Docs' },
   { to: '/apps', icon: AppsIcon, label: 'Apps' },
   { to: '/templates', icon: TemplatesIcon, label: 'Templates' },
   { to: '/metrics', icon: MetricsIcon, label: 'Metrics' },
   { to: '/logs', icon: LogsIcon, label: 'Logs' },
+  { to: '/billing', icon: BillingIcon, label: 'Billing' },
 ];
 
 export default function Sidebar({ onClose }: { onClose: () => void }) {
   const { admin } = useAuth();
+
   const filteredNavItems = navItems.filter((item) =>
     item.to === '/admin' ? admin : true
   );
+
+  const docsIndex = filteredNavItems.findIndex((item) => item.to === '/docs');
+  const beforeOrgs = filteredNavItems.slice(0, docsIndex + 1);
+  const afterOrgs = filteredNavItems.slice(docsIndex + 1);
+
   return (
-    <aside className="w-60 pl-2 flex flex-col h-[calc(100vh-2rem)] sticky top-0 m-4 bg-tile rounded-2xl">
+    <aside className="w-60 px-2 flex flex-col h-[calc(100vh-2rem)] sticky top-0 m-4 bg-tile rounded-2xl">
       <div className="flex items-center justify-between px-3 py-3 text-[20px]">
         <div className="flex items-center gap-2">
           <TeapotIcon />
@@ -54,9 +65,24 @@ export default function Sidebar({ onClose }: { onClose: () => void }) {
       </div>
 
       <nav className="flex flex-col text-muted flex-1">
-        {filteredNavItems.map((item) => {
+        {beforeOrgs.map((item) => {
           const Icon = item.icon;
+          return (
+            <NavLink
+              key={item.to}
+              to={item.to}
+              className="hover:text-accent-bright flex items-center gap-2 px-4 py-4 rounded-md text-[16px] font-mono transition-colors duration-700"
+            >
+              <Icon />
+              {item.label}
+            </NavLink>
+          );
+        })}
 
+        <OrgSwitcher />
+
+        {afterOrgs.map((item) => {
+          const Icon = item.icon;
           return (
             <NavLink
               key={item.to}
