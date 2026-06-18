@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react';
 
+import { useOrg } from '../context/OrgContext';
 import { createApp, deleteApp, listApps, rotateKey } from '../lib/app';
 
 type App = {
-  id: number;
   name: string;
+  slug: string;
   description: string;
   api_key: string;
   is_active: boolean;
@@ -33,9 +34,11 @@ function CopyButton({ text }: { text: string }) {
 function CreateAppModal({
   onClose,
   onCreate,
+  orgSlug,
 }: {
   onClose: () => void;
   onCreate: (app: App) => void;
+  orgSlug: string;
 }) {
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
@@ -46,7 +49,7 @@ function CreateAppModal({
     if (!name) return;
     setLoading(true);
     try {
-      const data = await createApp({ name, description });
+      const data = await createApp(orgSlug, { name, description });
       onCreate(data);
       onClose();
     } catch {
@@ -107,16 +110,18 @@ function CreateAppModal({
 }
 
 export default function AppDashboard() {
+  const { activeOrg } = useOrg();
   const [apps, setApps] = useState<App[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [showModal, setShowModal] = useState(false);
-  const [rotatingId, setRotatingId] = useState<number | null>(null);
+  const [rotatingSlug, setRotatingSlug] = useState<string | null>(null);
 
   useEffect(() => {
+    if (!activeOrg) return;
     async function fetchApps() {
       try {
-        const data = await listApps();
+        const data = await listApps(activeOrg!.slug);
         setApps(data.apps);
       } catch {
         setError('Failed to load apps');
@@ -125,29 +130,44 @@ export default function AppDashboard() {
       }
     }
     fetchApps();
-  }, []);
+  }, [activeOrg]);
 
-  async function handleDelete(id: number) {
+  async function handleDelete(appSlug: string) {
+    if (!activeOrg) return;
     try {
-      await deleteApp(id);
-      setApps(apps.filter((a) => a.id !== id));
+      await deleteApp(activeOrg.slug, appSlug);
+      setApps(apps.filter((a) => a.slug !== appSlug));
     } catch {
       setError('Failed to delete app');
     }
   }
 
-  async function handleRotateKey(id: number) {
-    setRotatingId(id);
+  async function handleRotateKey(appSlug: string) {
+    if (!activeOrg) return;
+    setRotatingSlug(appSlug);
     try {
-      const data = await rotateKey(id);
+      const data = await rotateKey(activeOrg.slug, appSlug);
       setApps(
-        apps.map((a) => (a.id === id ? { ...a, api_key: data.api_key } : a))
+        apps.map((a) =>
+          a.slug === appSlug ? { ...a, api_key: data.api_key } : a
+        )
       );
     } catch {
       setError('Failed to rotate key');
     } finally {
-      setRotatingId(null);
+      setRotatingSlug(null);
     }
+  }
+
+  if (!activeOrg) {
+    return (
+      <div className="rounded-xl bg-tile p-8 text-center">
+        <p className="text-[13px] text-muted">No organization selected</p>
+        <p className="mt-1 text-[11px] text-neutral-600">
+          Select or create an organization to manage apps
+        </p>
+      </div>
+    );
   }
 
   return (
@@ -176,7 +196,7 @@ export default function AppDashboard() {
       ) : (
         <div className="flex flex-col gap-3">
           {apps.map((app) => (
-            <div key={app.id} className="rounded-xl bg-tile p-5">
+            <div key={app.slug} className="rounded-xl bg-tile p-5">
               <div className="flex items-start justify-between mb-3">
                 <div>
                   <div className="text-[14px] font-medium">{app.name}</div>
@@ -193,7 +213,7 @@ export default function AppDashboard() {
                     {app.is_active ? 'active' : 'inactive'}
                   </span>
                   <button
-                    onClick={() => handleDelete(app.id)}
+                    onClick={() => handleDelete(app.slug)}
                     className="text-[11px] text-muted hover:text-red-400 transition-colors cursor-pointer"
                   >
                     Delete
@@ -205,18 +225,18 @@ export default function AppDashboard() {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-[10px] text-muted mb-1">API Key</p>
-                    <p className="font-mono text-[12px] text-neutral-400 truncate max-w-xs">
+                    <p className="font-mono text-[12px] text-neutral-400 break-all">
                       {app.api_key}
                     </p>
                   </div>
-                  <div className="flex items-center gap-3">
+                  <div className="flex flex-col sm:flex-row sm:items-center gap-3">
                     <CopyButton text={app.api_key} />
                     <button
-                      onClick={() => handleRotateKey(app.id)}
-                      disabled={rotatingId === app.id}
+                      onClick={() => handleRotateKey(app.slug)}
+                      disabled={rotatingSlug === app.slug}
                       className="text-[11px] text-muted hover:text-accent-bright transition-colors cursor-pointer disabled:opacity-50"
                     >
-                      {rotatingId === app.id ? 'Rotating...' : 'Rotate'}
+                      {rotatingSlug === app.slug ? 'Rotating...' : 'Rotate'}
                     </button>
                   </div>
                 </div>
@@ -230,6 +250,7 @@ export default function AppDashboard() {
         <CreateAppModal
           onClose={() => setShowModal(false)}
           onCreate={(app) => setApps([app, ...apps])}
+          orgSlug={activeOrg.slug}
         />
       )}
     </div>

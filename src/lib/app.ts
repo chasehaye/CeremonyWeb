@@ -1,17 +1,27 @@
 import sendRequest from './sendRequest';
 
-export function listApps() {
-  return sendRequest('/api/apps');
+export function listApps(orgSlug: string) {
+  return sendRequest(`/api/organization/${orgSlug}/apps`);
 }
 
-export function createApp(data: { name: string; description?: string }) {
-  return sendRequest('/api/apps', 'POST', data);
+export function createApp(
+  orgSlug: string,
+  data: { name: string; description?: string }
+) {
+  return sendRequest(`/api/organization/${orgSlug}/apps`, 'POST', data);
 }
 
-export function deleteApp(id: number) {
-  return sendRequest(`/api/apps/${id}`, 'DELETE');
+export function deleteApp(orgSlug: string, appSlug: string) {
+  return sendRequest(`/api/organization/${orgSlug}/apps/${appSlug}`, 'DELETE');
 }
 
-export function rotateKey(id: number) {
-  return sendRequest(`/api/apps/${id}/rotate-key`, 'POST');
+export function rotateKey(orgSlug: string, appSlug: string) {
+  return sendRequest(
+    `/api/organization/${orgSlug}/apps/${appSlug}/rotate-key`,
+    'POST'
+  );
+}
+
+export function getApp(orgSlug: string, appSlug: string) {
+  return sendRequest(`/api/organization/${orgSlug}/apps/${appSlug}`);
 }
