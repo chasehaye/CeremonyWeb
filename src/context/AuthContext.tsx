@@ -10,6 +10,7 @@ export type User = {
   is_approved: boolean;
   is_banned: boolean;
   can_create: boolean;
+  is_super_admin: boolean;
 };
 
 export type AuthContextType = {
@@ -25,6 +26,8 @@ export type AuthContextType = {
   setBanned: React.Dispatch<React.SetStateAction<boolean>>;
   canCreate: boolean;
   setCanCreate: React.Dispatch<React.SetStateAction<boolean>>;
+  superAdmin: boolean;
+  setSuperAdmin: React.Dispatch<React.SetStateAction<boolean>>;
   loading: boolean;
   logoutUser: () => Promise<void>;
 };
@@ -43,6 +46,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const [approved, setApproved] = useState(false);
   const [banned, setBanned] = useState(false);
   const [canCreate, setCanCreate] = useState(false);
+  const [superAdmin, setSuperAdmin] = useState(false);
 
   useEffect(() => {
     async function initAuth() {
@@ -55,6 +59,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
           setApproved(data.is_approved === true);
           setBanned(data.is_banned === true);
           setCanCreate(data.can_create === true);
+          setSuperAdmin(data.is_super_admin === true);
         }
       } catch {
         setUser(null);
@@ -76,6 +81,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
       setApproved(false);
       setBanned(false);
       setCanCreate(false);
+      setSuperAdmin(false);
     }
   };
 
@@ -94,6 +100,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
         setBanned,
         canCreate,
         setCanCreate,
+        superAdmin,
+        setSuperAdmin,
         loading,
         logoutUser,
       }}

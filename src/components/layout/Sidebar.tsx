@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { NavLink } from 'react-router-dom';
+import { Link, NavLink } from 'react-router-dom';
 
 import { useAuth } from '../../context/AuthContext';
 import { useOrg } from '../../context/OrgContext';
@@ -30,7 +30,7 @@ const navItems = [
 
 export default function Sidebar({ onClose }: { onClose: () => void }) {
   const { admin, user, logoutUser } = useAuth();
-  const { activeOrg, removeOrg } = useOrg();
+  const { activeOrg } = useOrg();
   const [showLogout, setShowLogout] = useState(false);
   const popoverRef = useRef<HTMLDivElement>(null);
 
@@ -63,7 +63,7 @@ export default function Sidebar({ onClose }: { onClose: () => void }) {
     })();
 
   return (
-    <aside className="w-60 px-2 flex flex-col h-[calc(100vh-2rem)] sticky top-0 m-4 bg-tile rounded-2xl">
+    <aside className="w-60 px-2 flex flex-col h-[calc(100vh-2rem)] sticky top-0 m-4 bg-tile rounded-2xl select-none">
       <div className="flex items-center justify-between px-3 py-3 text-[20px]">
         <div className="flex items-center gap-2">
           <TeapotIcon />
@@ -95,26 +95,12 @@ export default function Sidebar({ onClose }: { onClose: () => void }) {
             Organization
           </p>
           <div className="flex items-center justify-between">
-            <p className="text-[13px] font-mono text-accent-bright truncate">
-              {activeOrg.name}
-            </p>
-            <button
-              onClick={() => removeOrg(activeOrg.slug)}
-              className="text-muted hover:text-red-400 transition-colors cursor-pointer shrink-0 ml-2"
+            <Link
+              to={`/orgs/${activeOrg.slug}`}
+              className="text-[13px] font-mono text-accent-bright truncate hover:text-accent-subtle transition-colors cursor-pointer"
             >
-              <svg
-                className="w-3.5 h-3.5"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-              >
-                <polyline points="3 6 5 6 21 6" />
-                <path d="M19 6l-1 14H6L5 6" />
-                <path d="M10 11v6M14 11v6" />
-                <path d="M9 6V4h6v2" />
-              </svg>
-            </button>
+              {activeOrg.name}
+            </Link>
           </div>
         </div>
       )}
@@ -158,9 +144,9 @@ export default function Sidebar({ onClose }: { onClose: () => void }) {
             onClick={() => setShowLogout((prev) => !prev)}
           >
             <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-accent text-[10px] font-medium text-white">
-              {user?.user_name?.slice(0, 2).toUpperCase() ?? 'JD'}
+              {user?.user_name?.slice(0, 1).toUpperCase() ?? 'U'}
             </div>
-            <span className="font-mono text-[13px] ml-2 max-w-[56px] overflow-hidden whitespace-nowrap relative after:absolute after:right-0 after:top-0 after:h-full after:w-6 after:bg-gradient-to-l after:from-tile after:to-transparent">
+            <span className="font-mono text-[13px] ml-2 max-w-14 overflow-hidden whitespace-nowrap relative after:absolute after:right-0 after:top-0 after:h-full after:w-6 after:bg-linear-to-l after:from-tile after:to-transparent">
               {displayName}
             </span>
           </div>

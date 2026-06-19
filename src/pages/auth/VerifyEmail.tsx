@@ -34,6 +34,10 @@ export default function VerifyEmail() {
       <p className="text-[11px] text-muted text-center leading-relaxed max-w-48 md:max-w-60">
         Click the link in the email to verify your account and continue.
       </p>
+      <p className="text-[11px] text-muted text-center leading-relaxed">-</p>
+      <p className="text-[11px] text-muted text-center leading-relaxed max-w-48 md:max-w-60">
+        If you did not receive and email try again in 24 hrs
+      </p>
     </div>
   );
 }

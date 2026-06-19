@@ -40,6 +40,10 @@ export default function AdminApproval() {
         You'll be automatically redirected once an admin approves your account.
         Check back soon.
       </p>
+      <p className="text-[11px] text-muted text-center leading-relaxed max-w-40 md:max-w-52">
+        If you have lost approval for an unexpected reason please contact
+        support
+      </p>
     </div>
   );
 }

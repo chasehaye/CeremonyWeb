@@ -15,9 +15,10 @@ import LogsDashboard from './pages/dashboard/LogsDashboard';
 import TemplateDashboard from './pages/dashboard/TemplatesDashboard';
 import DocumentLanding from './pages/docs/DocumentLanding';
 import CreateOrg from './pages/org/CreateOrg';
+import OrgPage from './pages/org/OrgPage';
 
 function App() {
-  const { user, admin, loading } = useAuth();
+  const { user, admin, canCreate, loading } = useAuth();
 
   if (loading) {
     return (
@@ -71,7 +72,11 @@ function App() {
         <Route path="dashboard" element={<Dashboard />} />
         <Route path="apps" element={<AppDashboard />} />
 
-        <Route path="orgs/new" element={<CreateOrg />} />
+        <Route
+          path="orgs/new"
+          element={canCreate ? <CreateOrg /> : <Navigate to="/dashboard" replace />}
+        />
+        <Route path="orgs/:slug" element={<OrgPage />} />
         <Route path="templates" element={<TemplateDashboard />} />
         <Route path="docs" element={<DocumentLanding />} />
         <Route
