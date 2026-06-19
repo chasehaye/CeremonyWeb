@@ -1,7 +1,13 @@
 import { useEffect, useState } from 'react';
 
-import { useOrg } from '../context/OrgContext';
-import { createApp, deleteApp, listApps, rotateKey } from '../lib/app';
+import { useOrg } from '../../context/OrgContext';
+import {
+  createApp,
+  deleteApp,
+  listApps,
+  rotateKey,
+  toggleApp,
+} from '../../lib/app';
 
 type App = {
   name: string;
@@ -116,6 +122,7 @@ export default function AppDashboard() {
   const [error, setError] = useState('');
   const [showModal, setShowModal] = useState(false);
   const [rotatingSlug, setRotatingSlug] = useState<string | null>(null);
+  const [togglingSlug, setTogglingSlug] = useState<string | null>(null);
 
   useEffect(() => {
     if (!activeOrg) return;
@@ -159,6 +166,23 @@ export default function AppDashboard() {
     }
   }
 
+  async function handleToggle(appSlug: string) {
+    if (!activeOrg) return;
+    setTogglingSlug(appSlug);
+    try {
+      await toggleApp(activeOrg.slug, appSlug);
+      setApps(
+        apps.map((a) =>
+          a.slug === appSlug ? { ...a, is_active: !a.is_active } : a
+        )
+      );
+    } catch {
+      setError('Failed to toggle app');
+    } finally {
+      setTogglingSlug(null);
+    }
+  }
+
   if (!activeOrg) {
     return (
       <div className="rounded-xl bg-tile p-8 text-center">
@@ -182,7 +206,9 @@ export default function AppDashboard() {
         </button>
       </div>
 
-      {error && <p className="mb-4 text-[12px] text-red-400">{error}</p>}
+      {error && (
+        <p className="mb-4 text-[12px] text-center text-red-400">{error}</p>
+      )}
 
       {loading ? (
         <p className="text-[12px] text-muted">Loading...</p>
@@ -205,6 +231,21 @@ export default function AppDashboard() {
                       {app.description}
                     </div>
                   )}
+                  <button
+                    onClick={() => handleToggle(app.slug)}
+                    disabled={togglingSlug === app.slug}
+                    className={`mt-2 text-[11px] transition-colors cursor-pointer disabled:opacity-50 ${
+                      app.is_active
+                        ? 'text-muted hover:text-red-400'
+                        : 'text-red-400 hover:text-accent-bright'
+                    }`}
+                  >
+                    {togglingSlug === app.slug
+                      ? 'Updating...'
+                      : app.is_active
+                        ? 'Disable app'
+                        : 'Enable app'}
+                  </button>
                 </div>
                 <div className="flex items-center gap-2">
                   <span

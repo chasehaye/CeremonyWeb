@@ -8,6 +8,8 @@ export type User = {
   is_admin: boolean;
   is_verified: boolean;
   is_approved: boolean;
+  is_banned: boolean;
+  can_create: boolean;
 };
 
 export type AuthContextType = {
@@ -19,6 +21,10 @@ export type AuthContextType = {
   setVerified: React.Dispatch<React.SetStateAction<boolean>>;
   approved: boolean;
   setApproved: React.Dispatch<React.SetStateAction<boolean>>;
+  banned: boolean;
+  setBanned: React.Dispatch<React.SetStateAction<boolean>>;
+  canCreate: boolean;
+  setCanCreate: React.Dispatch<React.SetStateAction<boolean>>;
   loading: boolean;
   logoutUser: () => Promise<void>;
 };
@@ -35,6 +41,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const [loading, setLoading] = useState(true);
   const [verified, setVerified] = useState(false);
   const [approved, setApproved] = useState(false);
+  const [banned, setBanned] = useState(false);
+  const [canCreate, setCanCreate] = useState(false);
 
   useEffect(() => {
     async function initAuth() {
@@ -45,6 +53,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
           setAdmin(data.is_admin === true);
           setVerified(data.is_verified === true);
           setApproved(data.is_approved === true);
+          setBanned(data.is_banned === true);
+          setCanCreate(data.can_create === true);
         }
       } catch {
         setUser(null);
@@ -64,6 +74,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
       setAdmin(false);
       setVerified(false);
       setApproved(false);
+      setBanned(false);
+      setCanCreate(false);
     }
   };
 
@@ -78,6 +90,10 @@ export function AuthProvider({ children }: AuthProviderProps) {
         setVerified,
         approved,
         setApproved,
+        banned,
+        setBanned,
+        canCreate,
+        setCanCreate,
         loading,
         logoutUser,
       }}
@@ -86,6 +102,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     </AuthContext.Provider>
   );
 }
+
 /* eslint-disable react-refresh/only-export-components */
 export const useAuth = (): AuthContextType => {
   const context = useContext(AuthContext);

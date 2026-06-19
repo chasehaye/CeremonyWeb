@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 
-import { approveUser, listUsers, rejectUser } from '../lib/admin';
+import { approveUser, listUsers, rejectUser } from '../../lib/admin';
 
 type User = {
   id: number;

@@ -2,15 +2,18 @@ import { Navigate, Route, Routes } from 'react-router-dom';
 
 import Layout from './components/layout/Layout';
 import { useAuth } from './context/AuthContext';
-import AdminDashboard from './pages/AdminDashboard';
-import AppDashboard from './pages/AppDashboard';
-import Dashboard from './pages/Dashboard';
-import LogsDashboard from './pages/LogsDashboard';
 import AdminApproval from './pages/auth/AdminApproval';
+import BannedPage from './pages/auth/BannedPage';
 import Login from './pages/auth/Login';
 import SignUp from './pages/auth/Signup';
 import VerifyEmail from './pages/auth/VerifyEmail';
 import VerifyToken from './pages/auth/VerifyToken';
+import AdminDashboard from './pages/dashboard/AdminDashboard';
+import AppDashboard from './pages/dashboard/AppDashboard';
+import Dashboard from './pages/dashboard/Dashboard';
+import LogsDashboard from './pages/dashboard/LogsDashboard';
+import TemplateDashboard from './pages/dashboard/TemplatesDashboard';
+import DocumentLanding from './pages/docs/DocumentLanding';
 import CreateOrg from './pages/org/CreateOrg';
 
 function App() {
@@ -53,6 +56,14 @@ function App() {
     );
   }
 
+  if (user.is_banned) {
+    return (
+      <Routes>
+        <Route path="*" element={<BannedPage />} />
+      </Routes>
+    );
+  }
+
   return (
     <Routes>
       <Route path="/" element={<Layout />}>
@@ -61,16 +72,8 @@ function App() {
         <Route path="apps" element={<AppDashboard />} />
 
         <Route path="orgs/new" element={<CreateOrg />} />
-        <Route
-          path="templates"
-          element={<div className="text-muted">Templates — coming soon</div>}
-        />
-        <Route
-          path="docs"
-          element={
-            <div className="text-muted">Documentation — coming soon</div>
-          }
-        />
+        <Route path="templates" element={<TemplateDashboard />} />
+        <Route path="docs" element={<DocumentLanding />} />
         <Route
           path="metrics"
           element={<div className="text-muted">Metrics — coming soon</div>}

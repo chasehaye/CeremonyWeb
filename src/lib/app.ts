@@ -25,3 +25,10 @@ export function rotateKey(orgSlug: string, appSlug: string) {
 export function getApp(orgSlug: string, appSlug: string) {
   return sendRequest(`/api/organization/${orgSlug}/apps/${appSlug}`);
 }
+
+export function toggleApp(orgSlug: string, appSlug: string) {
+  return sendRequest(
+    `/api/organization/${orgSlug}/apps/${appSlug}/toggle`,
+    'PATCH'
+  );
+}

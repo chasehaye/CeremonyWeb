@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 
-import { listMailLogs } from '../lib/mailLogs';
+import { useOrg } from '../../context/OrgContext';
+import { listMailLogs } from '../../lib/mailLogs';
 
 type EmailLog = {
   id: number;
@@ -16,14 +17,17 @@ type LogsResponse = {
 };
 
 export default function LogsDashboard() {
+  const { activeOrg } = useOrg();
   const [logs, setLogs] = useState<EmailLog[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
   useEffect(() => {
+    if (!activeOrg) return;
+
     async function fetchLogs() {
       try {
-        const data: LogsResponse = await listMailLogs();
+        const data: LogsResponse = await listMailLogs(activeOrg!.slug);
         setLogs(data.logs);
       } catch {
         setError('Failed to load logs');
@@ -33,7 +37,7 @@ export default function LogsDashboard() {
     }
 
     fetchLogs();
-  }, []);
+  }, [activeOrg]);
 
   return (
     <div className="max-w-full">

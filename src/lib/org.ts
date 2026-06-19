@@ -15,3 +15,7 @@ export function listOrgs() {
 export function deleteOrg(slug: string) {
   return sendRequest(`/api/organization/${slug}`, 'DELETE');
 }
+
+export function getOrgStats(slug: string) {
+  return sendRequest(`/api/organization/${slug}/stats`);
+}

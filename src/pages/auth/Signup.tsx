@@ -55,7 +55,6 @@ export default function SignUp() {
   async function handleRegister(password: string) {
     try {
       const data = await registerUser({ email, name: username, password });
-      console.log(data);
       setUser(data);
       setAdmin(data.is_admin === true);
       setVerified(data.is_verified === true);

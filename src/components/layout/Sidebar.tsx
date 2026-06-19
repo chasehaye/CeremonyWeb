@@ -1,3 +1,4 @@
+import { useEffect, useRef, useState } from 'react';
 import { NavLink } from 'react-router-dom';
 
 import { useAuth } from '../../context/AuthContext';
@@ -28,8 +29,23 @@ const navItems = [
 ];
 
 export default function Sidebar({ onClose }: { onClose: () => void }) {
-  const { admin } = useAuth();
+  const { admin, user, logoutUser } = useAuth();
   const { activeOrg, removeOrg } = useOrg();
+  const [showLogout, setShowLogout] = useState(false);
+  const popoverRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (
+        popoverRef.current &&
+        !popoverRef.current.contains(e.target as Node)
+      ) {
+        setShowLogout(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   const filteredNavItems = navItems.filter((item) =>
     item.to === '/admin' ? admin : true
@@ -38,6 +54,13 @@ export default function Sidebar({ onClose }: { onClose: () => void }) {
   const docsIndex = filteredNavItems.findIndex((item) => item.to === '/docs');
   const beforeOrgs = filteredNavItems.slice(0, docsIndex + 1);
   const afterOrgs = filteredNavItems.slice(docsIndex + 1);
+
+  const displayName =
+    user?.user_name ||
+    (() => {
+      const emailName = user?.user_email?.split('@')[0] ?? '';
+      return emailName.length > 20 ? `${emailName.slice(0, 20)}...` : emailName;
+    })();
 
   return (
     <aside className="w-60 px-2 flex flex-col h-[calc(100vh-2rem)] sticky top-0 m-4 bg-tile rounded-2xl">
@@ -128,10 +151,34 @@ export default function Sidebar({ onClose }: { onClose: () => void }) {
         })}
       </nav>
 
-      <div className="mx-4 mb-4">
+      <div className="mx-4 mb-4 flex justify-between pr-2 gap-1 select-none">
+        <div className="relative" ref={popoverRef}>
+          <div
+            className="flex items-center text-muted cursor-pointer"
+            onClick={() => setShowLogout((prev) => !prev)}
+          >
+            <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-accent text-[10px] font-medium text-white">
+              {user?.user_name?.slice(0, 2).toUpperCase() ?? 'JD'}
+            </div>
+            <span className="font-mono text-[13px] ml-2 max-w-[56px] overflow-hidden whitespace-nowrap relative after:absolute after:right-0 after:top-0 after:h-full after:w-6 after:bg-gradient-to-l after:from-tile after:to-transparent">
+              {displayName}
+            </span>
+          </div>
+
+          {showLogout && (
+            <div className="absolute bottom-10 left-0 min-w-max rounded-lg border border-neutral-800 shadow-lg z-50">
+              <button
+                onClick={logoutUser}
+                className="w-full rounded-md px-3 py-2 font-mono text-[12px] text-muted hover:bg-neutral-800 hover:text-red-400 transition-colors cursor-pointer"
+              >
+                Log out
+              </button>
+            </div>
+          )}
+        </div>
         <NavLink
           to="/settings"
-          className="flex items-center text-muted hover:text-accent-bright text-[16px] font-mono gap-2 px-4 py-2 rounded-md transition-colors duration-700"
+          className="flex items-center text-muted hover:text-accent-bright text-[16px] font-mono gap-2 rounded-md transition-colors duration-700"
         >
           <SettingsIcon />
           <span>Settings</span>
